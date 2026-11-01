@@ -1,28 +1,15 @@
 import faiss
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sentence_transformers import SentenceTransformer
 
 
-class TfidfEmbedder:
-	def __init__(self):
-		self.vectorizer = TfidfVectorizer()
-
-	def fit(self, corpus):
-		self.vectorizer.fit(corpus)
-
-	def encode(self, texts):
-		vectors = self.vectorizer.transform(texts)
-		return vectors.toarray()
-
-
-def load_embedding_model():
-	return TfidfEmbedder()
+def load_embedding_model(model_name="all-MiniLM-L6-v2"):
+	return SentenceTransformer(model_name)
 
 
 def build_vector_store(chunks, model):
-	model.fit(chunks)
 	embeddings = model.encode(chunks)
-	embeddings_np = np.array(embeddings)
+	embeddings_np = np.array(embeddings).astype("float32")
 
 	dim = embeddings_np.shape[1]
 	index = faiss.IndexFlatL2(dim)
